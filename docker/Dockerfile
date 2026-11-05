@@ -1,5 +1,5 @@
 # Serves the static site with nginx as a non-root user on port 8080.
-FROM nginxinc/nginx-unprivileged:1.27-alpine
+FROM nginxinc/nginx-unprivileged:1.31-alpine
 
 LABEL org.opencontainers.image.title="devsandbox-pages" \
       org.opencontainers.image.description="Static DevSandbox showcase site served by nginx" \
