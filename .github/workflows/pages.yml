@@ -74,6 +74,6 @@ jobs:
         with:
           path: site
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
       - name: Smoke test the live site
         run: python scripts/smoke_test.py "${{ steps.deployment.outputs.page_url }}" --live --wait 60
