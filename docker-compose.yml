@@ -1,0 +1,33 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: devsandbox-pages:local
+    container_name: devsandbox-pages
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  # Optional: captures screenshots with headless Chromium inside Docker,
+  # so nothing extra needs installing on the host.
+  #   docker compose --profile tools run --rm screenshots
+  screenshots:
+    profiles: ["tools"]
+    image: mcr.microsoft.com/playwright/python:v1.48.0-jammy
+    working_dir: /work
+    volumes:
+      - ./:/work
+    environment:
+      BASE_URL: ${BASE_URL:-http://web:8080}
+      SHOT_PREFIX: ${SHOT_PREFIX:-local}
+    depends_on:
+      - web
+    command: ["python", "scripts/screenshots.py"]

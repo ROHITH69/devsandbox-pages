@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevSandbox: a CI/CD pipeline that runs on your laptop</title>
+  <meta name="description" content="DevSandbox scaffolds, builds and deploys your app locally with Docker, Jenkins, Kind Kubernetes and a local registry.">
+  <meta property="og:title" content="DevSandbox: a CI/CD pipeline that runs on your laptop">
+  <meta property="og:description" content="Detect your stack, generate the pipeline, and deploy to a local Kubernetes cluster. No cloud account needed.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Hanken+Grotesk:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <a class="brand" href="#top" aria-label="DevSandbox home">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7" fill="currentColor"/><path d="M9 16l4 4 10-9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      DevSandbox
+    </a>
+    <nav aria-label="Primary">
+      <a href="#pipeline">Pipeline</a>
+      <a href="#stacks">Stacks</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#delivery">How this site ships</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-copy">
+        <h1>A CI/CD pipeline that runs on your laptop.</h1>
+        <p class="lede">DevSandbox detects your stack, generates the Dockerfile, Kubernetes manifests and Jenkinsfile, then builds and deploys to a local Kind cluster. No cloud account, no bill.</p>
+        <p class="cta-row">
+          <a class="btn primary" href="#pipeline">See the pipeline</a>
+          <a class="btn" id="repo-link" href="https://github.com/ROHITH69/devsandbox-pages">View this repo</a>
+        </p>
+      </div>
+
+      <div class="run" id="run" aria-label="Simulated pipeline run">
+        <div class="run-head">
+          <span class="run-title">checkout-api</span>
+          <span class="run-status" id="run-status" role="status">Queued</span>
+        </div>
+        <ol class="stages" id="stages">
+          <li data-stage="detect"><span class="dot"></span>Detect stack</li>
+          <li data-stage="scaffold"><span class="dot"></span>Scaffold files</li>
+          <li data-stage="build"><span class="dot"></span>Build image</li>
+          <li data-stage="push"><span class="dot"></span>Push to registry</li>
+          <li data-stage="deploy"><span class="dot"></span>Deploy to Kind</li>
+        </ol>
+        <pre class="log" id="log" aria-live="off"></pre>
+        <button class="replay" id="replay" type="button" hidden>Run again</button>
+      </div>
+    </section>
+
+    <section id="pipeline" class="band">
+      <h2>One command, five stages</h2>
+      <p class="sub">Every project gets its own Jenkins container, Kubernetes namespace and ports, so several sandboxes can run side by side without colliding.</p>
+      <div class="grid3">
+        <article>
+          <h3>Detect and scaffold</h3>
+          <p>The scaffolding engine reads your project, picks the stack and writes the Dockerfile, manifests and Jenkinsfile from templates.</p>
+        </article>
+        <article>
+          <h3>Build and push</h3>
+          <p>Jenkins builds the image and pushes it to a local Docker registry, so the cluster pulls exactly what the pipeline produced.</p>
+        </article>
+        <article>
+          <h3>Deploy and observe</h3>
+          <p>The release lands in a per-project namespace on a Kind cluster. The web UI shows live pipeline status for each step.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="stacks" class="band alt">
+      <h2>Five stacks out of the box</h2>
+      <ul class="stack-list">
+        <li><strong>React</strong><span>Vite builds served as static assets</span></li>
+        <li><strong>Django</strong><span>Python web apps</span></li>
+        <li><strong>FastAPI</strong><span>Async Python APIs</span></li>
+        <li><strong>Express.js</strong><span>Node.js services</span></li>
+        <li><strong>Spring Boot</strong><span>Java services</span></li>
+      </ul>
+    </section>
+
+    <section id="architecture" class="band">
+      <h2>How the pieces fit</h2>
+      <p class="sub">A Go CLI does the orchestration. An Express API and a React UI sit on top, so you can work from the terminal or the browser.</p>
+      <figure class="arch">
+        <svg viewBox="0 0 760 250" role="img" aria-labelledby="arch-t arch-d">
+          <title id="arch-t">DevSandbox architecture</title>
+          <desc id="arch-d">The React UI calls the Express API, which runs the Go CLI. The CLI drives Docker, Jenkins, a local registry and a Kind Kubernetes cluster.</desc>
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1d2b3a"/></marker></defs>
+          <g class="box"><rect x="10" y="95" width="150" height="60" rx="8"/><text x="85" y="130">React UI (Vite)</text></g>
+          <g class="box"><rect x="205" y="95" width="150" height="60" rx="8"/><text x="280" y="130">Express API</text></g>
+          <g class="box key"><rect x="400" y="95" width="150" height="60" rx="8"/><text x="475" y="130">Go CLI</text></g>
+          <g class="box"><rect x="600" y="10" width="150" height="46" rx="8"/><text x="675" y="38">Docker</text></g>
+          <g class="box"><rect x="600" y="70" width="150" height="46" rx="8"/><text x="675" y="98">Jenkins</text></g>
+          <g class="box"><rect x="600" y="130" width="150" height="46" rx="8"/><text x="675" y="158">Local registry</text></g>
+          <g class="box"><rect x="600" y="190" width="150" height="46" rx="8"/><text x="675" y="218">Kind cluster</text></g>
+          <g stroke="#1d2b3a" stroke-width="1.6" fill="none" marker-end="url(#ah)">
+            <path d="M160 125H203"/><path d="M355 125H398"/>
+            <path d="M550 118L598 36"/><path d="M550 122L598 94"/><path d="M550 130L598 152"/><path d="M550 134L598 212"/>
+          </g>
+        </svg>
+      </figure>
+    </section>
+
+    <section id="delivery" class="band alt">
+      <h2>How this page gets to you</h2>
+      <p class="sub">This site is its own DevOps exercise. Every push to <code>main</code> runs the same checks you can run locally, then deploys to GitHub Pages.</p>
+      <ol class="flow">
+        <li><strong>Validate</strong><span>HTML structure, local links, required files</span></li>
+        <li><strong>Container test</strong><span>Build the nginx image and smoke-test it over HTTP</span></li>
+        <li><strong>Package</strong><span>Upload the <code>site/</code> folder as a Pages artifact</span></li>
+        <li><strong>Deploy</strong><span>Publish to GitHub Pages with the official action</span></li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built as Task 6 of the Elevate Labs DevOps Internship. Static HTML, CSS and a little JavaScript. No trackers, no cookies.</p>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

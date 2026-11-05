@@ -1,0 +1,79 @@
+name: CI/CD to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Set repository owner in links
+        run: python scripts/configure.py --repo "$GITHUB_REPOSITORY" --no-docs
+      - name: HTML, link and file checks
+        run: python scripts/validate.py --strict
+
+  container-test:
+    name: Container smoke test
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build image
+        run: docker build -f docker/Dockerfile -t devsandbox-pages:ci .
+      - name: Start container
+        run: docker run -d --name site -p 8080:8080 devsandbox-pages:ci
+      - name: Wait for healthy
+        run: |
+          for i in $(seq 1 20); do
+            s=$(docker inspect -f '{{.State.Health.Status}}' site)
+            echo "health: $s"; [ "$s" = "healthy" ] && exit 0; sleep 2
+          done
+          docker logs site; exit 1
+      - name: HTTP smoke tests
+        run: python scripts/smoke_test.py http://localhost:8080/
+
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [validate, container-test]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Set repository owner in links
+        run: python scripts/configure.py --repo "$GITHUB_REPOSITORY" --no-docs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Smoke test the live site
+        run: python scripts/smoke_test.py "${{ steps.deployment.outputs.page_url }}" --live --wait 60
