@@ -63,13 +63,17 @@ Images are written to [`screenshots/`](screenshots/).
 
 ## Screenshots
 
-| Home page | Mobile |
-|-----------|--------|
-| ![Home page](screenshots/local-01-home-pipeline-run.png) | ![Mobile view](screenshots/local-05-mobile.png) |
+| Home page | Pipeline stages |
+|-----------|-----------------|
+| ![Home page](screenshots/01-home.png) | ![Pipeline stages](screenshots/02-pipeline.png) |
 
-| Architecture section | Custom 404 |
-|----------------------|------------|
-| ![Architecture](screenshots/local-03-architecture.png) | ![404 page](screenshots/local-04-custom-404.png) |
+| Supported stacks | Architecture |
+|------------------|--------------|
+| ![Stacks](screenshots/03-stacks.png) | ![Architecture](screenshots/04-architecture.png) |
+
+| Custom 404 page | Smoke tests passing (15/15) |
+|-----------------|-----------------------------|
+| ![404 page](screenshots/05-custom-404.png) | ![Smoke tests](screenshots/06-smoke-tests.png) |
 
 ## Repository layout
 
